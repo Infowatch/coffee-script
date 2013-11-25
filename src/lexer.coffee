@@ -101,6 +101,9 @@ exports.Lexer = class Lexer
   identifierToken: ->
     return 0 unless match = IDENTIFIER.exec @chunk
     [input, id, colon] = match
+    
+    # Uppercase first letter after dash.
+    id = id.replace /-+([a-zA-Z0-9$_])/g, (string) -> string[1].toUpperCase()
 
     # Preserve length of id for location data
     idLength = id.length
@@ -778,7 +781,7 @@ BOM = 65279
 
 # Token matching regexes.
 IDENTIFIER = /// ^
-  ( [$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]* )
+  ( [$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*(?:(?:\-[a-zA-Z]+)?)* )
   ( [^\n\S]* : (?!:) )?  # Is this a property name?
 ///
 
