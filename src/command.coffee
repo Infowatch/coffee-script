@@ -10,7 +10,6 @@ path           = require 'path'
 helpers        = require './helpers'
 optparse       = require './optparse'
 CoffeeScript   = require './coffee-script'
-mkdirp         = require 'mkdirp'
 {spawn, exec}  = require 'child_process'
 {EventEmitter} = require 'events'
 
@@ -59,6 +58,7 @@ sourceCode   = []
 notSources   = {}
 watchedDirs  = {}
 optionParser = null
+jsToSources  = {}
 
 # Run `coffee` by parsing passed options and determining what action to take.
 # Many flags cause us to divert before compiling anything. Flags passed after
@@ -330,6 +330,20 @@ outputPath = (source, base, extension=".js") ->
     dir = path.join opts.output, path.relative base, srcDir
   path.join dir, basename + extension
 
+# Recursively mkdir, like `mkdir -p`.
+mkdirp = (dir, fn) ->
+  mode = 0o777 & ~process.umask()
+
+  do mkdirs = (p = dir, fn) ->
+    fs.exists p, (exists) ->
+      if exists
+        fn()
+      else
+        mkdirs path.dirname(p), ->
+          fs.mkdir p, mode, (err) ->
+            return fn err if err
+            fn()
+
 # Write out a JavaScript source file with the compiled code. By default, files
 # are written out in `cwd` as `.js` files with the same name, but the output
 # directory can be customized with `--output`.
@@ -339,6 +353,12 @@ outputPath = (source, base, extension=".js") ->
 writeJs = (base, sourcePath, js, jsPath, generatedSourceMap = null) ->
   sourceMapPath = outputPath sourcePath, base, ".js.map"
   jsDir  = path.dirname jsPath
+  if jsPath of jsToSources
+      printLine "Error: The two following source files have the same output file:"
+      printLine "    " + jsToSources[jsPath]
+      printLine "    " + sourcePath
+      process.exit 1
+  jsToSources[jsPath] = sourcePath
   compile = ->
     if opts.compile
       js = ' ' if js.length <= 0

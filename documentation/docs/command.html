@@ -141,7 +141,6 @@ path           = <span class="hljs-built_in">require</span> <span class="hljs-st
 helpers        = <span class="hljs-built_in">require</span> <span class="hljs-string">'./helpers'</span>
 optparse       = <span class="hljs-built_in">require</span> <span class="hljs-string">'./optparse'</span>
 CoffeeScript   = <span class="hljs-built_in">require</span> <span class="hljs-string">'./coffee-script'</span>
-mkdirp         = <span class="hljs-built_in">require</span> <span class="hljs-string">'mkdirp'</span>
 {spawn, exec}  = <span class="hljs-built_in">require</span> <span class="hljs-string">'child_process'</span>
 {EventEmitter} = <span class="hljs-built_in">require</span> <span class="hljs-string">'events'</span>
 
@@ -237,7 +236,8 @@ sources      = []
 sourceCode   = []
 notSources   = {}
 watchedDirs  = {}
-optionParser = <span class="hljs-literal">null</span></pre></div></div>
+optionParser = <span class="hljs-literal">null</span>
+jsToSources  = {}</pre></div></div>
             
         </li>
         
@@ -639,6 +639,32 @@ the compiled JS version as well.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
+              <p>Recursively mkdir, like <code>mkdir -p</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">mkdirp</span> = <span class="hljs-params">(dir, fn)</span> -&gt;</span>
+  mode = <span class="hljs-number">0</span>o777 &amp; ~process.umask()
+
+  <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-title">mkdirs</span> = <span class="hljs-params">(p = dir, fn)</span> -&gt;</span>
+    fs.exists p, <span class="hljs-function"><span class="hljs-params">(exists)</span> -&gt;</span>
+      <span class="hljs-keyword">if</span> exists
+        fn()
+      <span class="hljs-keyword">else</span>
+        mkdirs path.dirname(p),<span class="hljs-function"> -&gt;</span>
+          fs.mkdir p, mode, <span class="hljs-function"><span class="hljs-params">(err)</span> -&gt;</span>
+            <span class="hljs-keyword">return</span> fn err <span class="hljs-keyword">if</span> err
+            fn()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
               <p>Write out a JavaScript source file with the compiled code. By default, files
 are written out in <code>cwd</code> as <code>.js</code> files with the same name, but the output
 directory can be customized with <code>--output</code>.</p>
@@ -650,6 +676,12 @@ same directory as the <code>.js</code> file.</p>
             <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">writeJs</span> = <span class="hljs-params">(base, sourcePath, js, jsPath, generatedSourceMap = <span class="hljs-literal">null</span>)</span> -&gt;</span>
   sourceMapPath = outputPath sourcePath, base, <span class="hljs-string">".js.map"</span>
   jsDir  = path.dirname jsPath
+  <span class="hljs-keyword">if</span> jsPath <span class="hljs-keyword">of</span> jsToSources
+      printLine <span class="hljs-string">"Error: The two following source files have the same output file:"</span>
+      printLine <span class="hljs-string">"    "</span> + jsToSources[jsPath]
+      printLine <span class="hljs-string">"    "</span> + sourcePath
+      process.exit <span class="hljs-number">1</span>
+  jsToSources[jsPath] = sourcePath
   <span class="hljs-function"><span class="hljs-title">compile</span> = -&gt;</span>
     <span class="hljs-keyword">if</span> opts.compile
       js = <span class="hljs-string">' '</span> <span class="hljs-keyword">if</span> js.length &lt;= <span class="hljs-number">0</span>
@@ -671,11 +703,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Convenience for cleaner setTimeouts.</p>
 
@@ -686,11 +718,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>When watching scripts, it’s useful to log changes with the timestamp.</p>
 
@@ -702,11 +734,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Pretty-print a stream of tokens, sans location data.</p>
 
@@ -722,11 +754,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Use the <a href="optparse.html">OptionParser module</a> to extract all options from
 <code>process.argv</code> that are specified in <code>SWITCHES</code>.</p>
@@ -743,11 +775,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>The compile-time options to pass to the CoffeeScript compiler.</p>
 
@@ -782,11 +814,11 @@ same directory as the <code>.js</code> file.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Start up a new Node.js instance with the arguments in <code>--nodejs</code> passed to
 the <code>node</code> binary, preserving the other options.</p>
@@ -806,11 +838,11 @@ the <code>node</code> binary, preserving the other options.</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Print the <code>--help</code> usage message and exit. Deprecated switches are not
 shown.</p>
@@ -823,11 +855,11 @@ shown.</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Print the <code>--version</code> message and exit.</p>
 

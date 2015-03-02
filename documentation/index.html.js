@@ -34,7 +34,7 @@
         <a href="#operators">Operators and Aliases</a>
         <a href="#classes">Classes, Inheritance, and Super</a>
         <a href="#destructuring">Destructuring Assignment</a>
-        <a href="#fat-arrow">Function Binding</a>
+        <a href="#fat-arrow">Bound and Generator Functions</a>
         <a href="#embedded">Embedded JavaScript</a>
         <a href="#switch">Switch and Try/Catch</a>
         <a href="#comparisons">Chained Comparisons</a>
@@ -110,7 +110,7 @@
 
     <p>
       <b>Latest Version:</b>
-      <a href="http://github.com/jashkenas/coffeescript/tarball/1.8.0">1.8.0</a>
+      <a href="http://github.com/jashkenas/coffeescript/tarball/1.9.1">1.9.1</a>
     </p>
 
     <pre>npm install -g coffee-script</pre>
@@ -142,8 +142,8 @@
 
     <p>
       To install, first make sure you have a working copy of the latest stable version of
-      <a href="http://nodejs.org/">Node.js</a>, and <a href="http://npmjs.org">npm</a>
-      (the Node Package Manager). You can then install CoffeeScript globally with npm:
+      <a href="http://nodejs.org/">Node.js</a>. You can then install CoffeeScript globally
+      with <a href="http://npmjs.org">npm</a>:
     </p>
 
     <pre>
@@ -707,7 +707,7 @@ Expressions
     <%= codeFor('soaks') %>
     <p>
       Soaking up nulls is similar to Ruby's
-      <a href="http://andand.rubyforge.org/">andand gem</a>, and to the
+      <a href="https://rubygems.org/gems/andand">andand gem</a>, and to the
       <a href="http://groovy.codehaus.org/Operators#Operators-SafeNavigationOperator%28%3F.%29">safe navigation operator</a>
       in Groovy.
     </p>
@@ -793,7 +793,7 @@ Expressions
 
     <p>
       <span id="fat-arrow" class="bookmark"></span>
-      <b class="header">Function binding</b>
+      <b class="header">Bound Functions, Generator Functions</b>
       In JavaScript, the <tt>this</tt> keyword is dynamically scoped to mean the
       object that the current function is attached to. If you pass a function as
       a callback or attach it to a different object, the original value of <tt>this</tt>
@@ -820,6 +820,13 @@ Expressions
       be automatically bound to each instance of the class when the instance is
       constructed.
     </p>
+    <p>
+      CoffeeScript functions also support 
+      <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">ES6 generator functions</a>
+      through the <tt>yield</tt> keyword. There's no <tt>function*(){}</tt> 
+      nonsense &mdash; a generator in CoffeeScript is simply a function that yields.
+    </p>
+    <%= codeFor('generators', 'ps.next().value') %>
 
     <p>
       <span id="embedded" class="bookmark"></span>
@@ -1195,6 +1202,53 @@ Expressions
       <span id="changelog" class="bookmark"></span>
       Change Log
     </h2>
+
+    <p>
+      <%= releaseHeader('2015-02-18', '1.9.1', '1.9.0') %>
+      <ul>
+        <li>
+          Interpolation now works in object literal keys (again). You can use this to 
+          dynamically name properties.
+        </li>
+        <li>
+          Internal compiler names no longer start with underscores. This makes
+          the generated JavaScript a bit prettier, and also fixes an issue with
+          the completely broken and ungodly way that AngularJS "parses" function
+          arguments.
+        </li>
+        <li>
+          Fixed a few <tt>yield</tt>-related bugs.
+        </li>
+        <li>
+          Minor bug fixes and various improvements to compiler error messages.
+        </li>
+      </ul>
+    </p>
+
+    <p>
+      <%= releaseHeader('2015-01-29', '1.9.0', '1.8.0') %>
+      <ul>
+        <li>
+          CoffeeScript now supports ES6 generators. A generator is simply a function
+          that <tt>yield</tt>s. 
+        </li>
+        <li>
+          More robust parsing and improved error messages for strings and regexes — 
+          especially with respect to interpolation.
+        </li>
+        <li>
+          Changed strategy for the generation of internal compiler variable names.
+          Note that this means that <tt>@example</tt> function parameters are no longer
+          available as naked <tt>example</tt> variables within the function body.
+        </li>
+        <li>
+          Fixed REPL compatibility with latest versions of Node and Io.js.
+        </li>
+        <li>
+          Various minor bug fixes.
+        </li>
+      </ul>
+    </p>
 
     <p>
       <%= releaseHeader('2014-08-26', '1.8.0', '1.7.1') %>
