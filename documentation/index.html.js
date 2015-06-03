@@ -110,7 +110,7 @@
 
     <p>
       <b>Latest Version:</b>
-      <a href="http://github.com/jashkenas/coffeescript/tarball/1.9.1">1.9.1</a>
+      <a href="http://github.com/jashkenas/coffeescript/tarball/1.9.3">1.9.3</a>
     </p>
 
     <pre>npm install -g coffee-script</pre>
@@ -532,6 +532,10 @@ Expressions
       <tt>evens = (x for x in [0..10] by 2)</tt>
     </p>
     <p>
+      If you don't need the current iteration value you may omit it:<br />
+      <tt>browser.closeCurrentTab() for [0...count]</tt>
+    </p>
+    <p>
       Comprehensions can also be used to iterate over the keys and values in
       an object. Use <tt>of</tt> to signal comprehension over the properties of
       an object instead of the values in an array.
@@ -658,8 +662,12 @@ Expressions
       test for JavaScript object-key presence.
     </p>
     <p>
-      To simplify math expressions, <tt>**</tt> can be used for exponentiation, <tt>//</tt> performs integer division and <tt>%%</tt> provides true mathematical modulo.
+      To simplify math expressions, <tt>**</tt> can be used for exponentiation
+      and <tt>//</tt> performs integer division. <tt>%</tt> works just like in
+      JavaScript, while <tt>%%</tt> provides
+      <a href="http://en.wikipedia.org/wiki/Modulo_operation">“dividend dependent modulo”</a>:
     </p>
+    <%= codeFor('modulo') %>
     <p>
       All together now:
     </p>
@@ -806,7 +814,7 @@ Expressions
       it to the current value of <tt>this</tt>, right on the spot. This is helpful
       when using callback-based libraries like Prototype or jQuery, for creating
       iterator functions to pass to <tt>each</tt>, or event-handler functions
-      to use with <tt>bind</tt>. Functions created with the fat arrow are able to access
+      to use with <tt>on</tt>. Functions created with the fat arrow are able to access
       properties of the <tt>this</tt> where they're defined.
     </p>
     <%= codeFor('fat_arrow') %>
@@ -821,12 +829,16 @@ Expressions
       constructed.
     </p>
     <p>
-      CoffeeScript functions also support 
+      CoffeeScript functions also support
       <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">ES6 generator functions</a>
-      through the <tt>yield</tt> keyword. There's no <tt>function*(){}</tt> 
+      through the <tt>yield</tt> keyword. There's no <tt>function*(){}</tt>
       nonsense &mdash; a generator in CoffeeScript is simply a function that yields.
     </p>
     <%= codeFor('generators', 'ps.next().value') %>
+    <p>
+      <tt>yield*</tt> is called <tt>yield from</tt>, and <tt>yield return</tt>
+      may be used if you need to force a generator that doesn't yield.
+    </p>
 
     <p>
       <span id="embedded" class="bookmark"></span>
@@ -862,8 +874,9 @@ Expressions
     <p>
       <span id="try" class="bookmark"></span>
       <b class="header">Try/Catch/Finally</b>
-      Try/catch statements are just about the same as JavaScript (although
-      they work as expressions).
+      Try-expressions have the same semantics as try-statements in JavaScript,
+      though in CoffeeScript, you may omit <em>both</em> the catch and finally
+      parts. The catch part may also omit the error parameter if it is not needed.
     </p>
     <%= codeFor('try') %>
 
@@ -882,7 +895,8 @@ Expressions
       <b class="header">String Interpolation, Block Strings, and Block Comments</b>
       Ruby-style string interpolation is included in CoffeeScript. Double-quoted
       strings allow for interpolated values, using <tt>#{ ... }</tt>,
-      and single-quoted strings are literal.
+      and single-quoted strings are literal. You may even use interpolation in
+      object keys.
     </p>
     <%= codeFor('interpolation', 'sentence') %>
     <p>
@@ -1054,6 +1068,8 @@ Expressions
         <a href="http://www.packtpub.com/coffeescript-application-development/book">CoffeeScript Application Development</a>
         from Packt, introduces CoffeeScript while
         walking through the process of building a demonstration web application.
+        A <a href="https://www.packtpub.com/web-development/coffeescript-application-development-cookbook">CoffeeScript Application Development Coookbook</a>
+        with over 90 "recipes" is also available.
       </li>
       <li>
         <a href="http://www.manning.com/lee/">CoffeeScript in Action</a>
@@ -1204,20 +1220,74 @@ Expressions
     </h2>
 
     <p>
+      <%= releaseHeader('2015-05-14', '1.9.3', '1.9.2') %>
+      <ul>
+        <li>
+          Bugfix for interpolation in the first key of an object literal in an
+          implicit call.
+        </li>
+        <li>
+          Fixed broken error messages in the REPL, as well as a few minor bugs
+          with the REPL.
+        </li>
+        <li>
+          Fixed source mappings for tokens at the beginning of lines when
+          compiling with the <tt>--bare</tt> option. This has the nice side
+          effect of generating smaller source maps.
+        </li>
+        <li>
+          Slight formatting improvement of compiled block comments.
+        </li>
+        <li>
+          Better error messages for <tt>on</tt>, <tt>off</tt>, <tt>yes</tt> and
+          <tt>no</tt>.
+        </li>
+      </ul>
+    </p>
+
+    <p>
+      <%= releaseHeader('2015-04-15', '1.9.2', '1.9.1') %>
+      <ul>
+        <li>
+          Fixed a <b>watch</b> mode error introduced in 1.9.1 when compiling
+          multiple files with the same filename.
+        </li>
+        <li>
+          Bugfix for <tt>yield</tt> around expressions containing
+          <tt>this</tt>.
+        </li>
+        <li>
+          Added a Ruby-style <tt>-r</tt> option to the REPL, which allows
+          requiring a module before execution with <tt>--eval</tt> or
+          <tt>--interactive</tt>.
+        </li>
+        <li>
+          In <tt>&lt;script type="text/coffeescript"&gt;</tt> tags, to avoid
+          possible duplicate browser requests for .coffee files, 
+          you can now use the <tt>data-src</tt> attribute instead of <tt>src</tt>.
+        </li>
+        <li>
+          Minor bug fixes for IE8, strict ES5 regular expressions and Browserify.
+        </li>
+      </ul>
+    </p>
+
+    <p>
       <%= releaseHeader('2015-02-18', '1.9.1', '1.9.0') %>
       <ul>
         <li>
-          Interpolation now works in object literal keys (again). You can use this to 
+          Interpolation now works in object literal keys (again). You can use this to
           dynamically name properties.
         </li>
         <li>
-          Internal compiler names no longer start with underscores. This makes
+          Internal compiler variable names no longer start with underscores. This makes
           the generated JavaScript a bit prettier, and also fixes an issue with
           the completely broken and ungodly way that AngularJS "parses" function
           arguments.
         </li>
         <li>
-          Fixed a few <tt>yield</tt>-related bugs.
+          Fixed a few <tt>yield</tt>-related edge cases with <tt>yield return</tt>
+          and <tt>yield throw</tt>.
         </li>
         <li>
           Minor bug fixes and various improvements to compiler error messages.
@@ -1230,10 +1300,10 @@ Expressions
       <ul>
         <li>
           CoffeeScript now supports ES6 generators. A generator is simply a function
-          that <tt>yield</tt>s. 
+          that <tt>yield</tt>s.
         </li>
         <li>
-          More robust parsing and improved error messages for strings and regexes — 
+          More robust parsing and improved error messages for strings and regexes —
           especially with respect to interpolation.
         </li>
         <li>

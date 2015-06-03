@@ -90,7 +90,7 @@ exports.Base = class Base
         meth = 'call'
       func = new Value func, [new Access new Literal meth]
     parts = (new Call func, args).compileNode o
-    if func.isGenerator
+    if func.isGenerator or func.base?.isGenerator
       parts.unshift @makeCode "(yield* "
       parts.push    @makeCode ")"
     parts
@@ -584,7 +584,7 @@ exports.Comment = class Comment extends Base
   makeReturn:      THIS
 
   compileNode: (o, level) ->
-    comment = @comment.replace /^(\s*)# /gm, "$1 * "
+    comment = @comment.replace /^(\s*)#(?=\s)/gm, "$1 *"
     code = "/*#{multident comment, @tab}#{if '\n' in comment then "\n#{@tab}" else ''} */"
     code = o.indent + code if (level or o.level) is LEVEL_TOP
     [@makeCode("\n"), @makeCode(code)]
@@ -952,7 +952,7 @@ exports.Obj = class Obj extends Base
       indent = if prop instanceof Comment then '' else idt
       indent += TAB if hasDynamic and i < dynamicIndex
       if prop instanceof Assign and prop.variable instanceof Value and prop.variable.hasProperties()
-        prop.variable.error 'Invalid object key'
+        prop.variable.error 'invalid object key'
       if prop instanceof Value and prop.this
         prop = new Assign prop.properties[0].name, prop, 'object'
       if prop not instanceof Comment
